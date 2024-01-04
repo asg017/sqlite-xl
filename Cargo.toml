@@ -1,0 +1,12 @@
+[package]
+name = "sqlite-xl"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+sqlite-loadable = "0.0.6-alpha.6"
+calamine = "0.23.1"
+thiserror = "1.0"
+
+[lib]
+crate-type = ["cdylib", "staticlib"]

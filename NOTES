@@ -1,0 +1,40 @@
+- `xl_version()`
+- `xl_debug()`
+- `xl_extract()`
+- `xl_column_name(idx)`
+- `xl_address(column_idx, row_idx)`
+- `xl_each()`
+- `xl_rows()`
+- `xl0()`
+
+```sql
+
+create virtual table temp.reader using spreadsheet();
+
+select
+  address,
+  value
+from xl_cells(
+  readfile('My Workbook1.xlsx'),
+  'Sheet2!A1:B100'
+);
+
+select
+  row ->> 'A',
+  row ->> 'B'
+from xl_rows(
+  readfile('My Workbook1.xlsx'),
+  'Sheet2!A1:B100'
+);
+
+
+create virtual table temp.my_table using xl0(
+  filename="./My Workbook1.xlsx",
+  range="A2:F",
+  headers=1
+);
+
+select * from temp.my_table;
+
+create virtual table temp.tbl using xl0("[SourceWorkbook.xlsx]Sheet1!$A$1");
+```
