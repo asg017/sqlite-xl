@@ -9,7 +9,7 @@ SQLITE_WASM_COMPILED_SQLITE3C=$(prefix)/sqlite-src-$(SQLITE_WASM_VERSION)/sqlite
 SQLITE_WASM_COMPILED_MJS=$(prefix)/sqlite-src-$(SQLITE_WASM_VERSION)/ext/wasm/jswasm/sqlite3.mjs
 SQLITE_WASM_COMPILED_WASM=$(prefix)/sqlite-src-$(SQLITE_WASM_VERSION)/ext/wasm/jswasm/sqlite3.wasm
 
-TARGET_WASM_LIB=$(prefix)/libsqlite_robotstxt.wasm.a
+TARGET_WASM_LIB=$(prefix)/libsqlite_xl.wasm.a
 TARGET_WASM_MJS=$(prefix)/sqlite3.mjs
 TARGET_WASM_WASM=$(prefix)/sqlite3.wasm
 TARGET_WASM=$(TARGET_WASM_MJS) $(TARGET_WASM_WASM)
@@ -24,11 +24,11 @@ $(SQLITE_WASM_COMPILED_SQLITE3C): $(SQLITE_WASM_SRCZIP)
 $(TARGET_WASM_LIB): $(shell find src -type f -name '*.rs')
 	RUSTFLAGS="-Clink-args=-sERROR_ON_UNDEFINED_SYMBOLS=0 -Clink-args=--no-entry" \
 		cargo build --release --target wasm32-unknown-emscripten --features=static
-		cp target/wasm32-unknown-emscripten/release/libsqlite_robotstxt.a $@
+		cp target/wasm32-unknown-emscripten/release/libsqlite_xl.a $@
 
 $(SQLITE_WASM_COMPILED_MJS) $(SQLITE_WASM_COMPILED_WASM): $(SQLITE_WASM_COMPILED_SQLITE3C) $(TARGET_WASM_LIB)
 	(cd $(prefix)/sqlite-src-$(SQLITE_WASM_VERSION)/ext/wasm && \
-		make sqlite3_wasm_extra_init.c=../../../libsqlite_robotstxt.wasm.a "emcc.flags=-s EXTRA_EXPORTED_RUNTIME_METHODS=['ENV'] -s FETCH")
+		make sqlite3_wasm_extra_init.c=../../../libsqlite_xl.wasm.a "emcc.flags=-s EXTRA_EXPORTED_RUNTIME_METHODS=['ENV'] -s FETCH")
 
 $(TARGET_WASM_MJS): $(SQLITE_WASM_COMPILED_MJS)
 	cp $< $@
