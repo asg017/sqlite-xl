@@ -8,11 +8,31 @@
     <script type="module">
       import {attach} from "./slim.js";
       import {default as init} from "./sqlite3.mjs";
+      const sampleXlsx = await fetch('file-sample.xlsx').then(r => r.arrayBuffer())
+      console.log(sampleXlsx);
       const sqlite3 = await init();
-      attach(document.body.querySelector('#target'), sqlite3,
-`select
-  xl_version();
-`);
+      function prepareStatement(stmt) {
+        if (stmt.getParamIndex(":sample_xlsx") !== undefined) {
+          stmt.bind({ ":sample_xlsx": sampleXlsx });
+        }
+        sampleXlsx
+      }
+      attach({
+        target: document.body.querySelector('#target'),
+        sqlite3,
+        prepareStatement,
+initialCode: `select
+  rowid,
+  xl_at(row, 0),
+  xl_at(row, 1),
+  xl_at(row, 2),
+  xl_at(row, 3),
+  xl_at(row, 4)
+from xl_rows(:sample_xlsx)
+limit 10;
+`,
+
+      });
     </script>
   </body>
 </html>
