@@ -1,6 +1,7 @@
 /target
 *.xls
-*.xlsx
 *.zip
 *.ods
 dist/
+date.xlsx
+file.xlsx

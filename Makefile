@@ -61,6 +61,7 @@ $(TARGET_SITE_DIR):
 $(TARGET_SITE): site/index.html $(TARGET_SITE_DIR) $(TARGET_WASM_MJS) $(TARGET_WASM_WASM) $(TARGET_SITE_DIR)/slim.js $(TARGET_SITE_DIR)/slim.css
 	cp $(TARGET_WASM_MJS) $(TARGET_SITE_DIR)
 	cp $(TARGET_WASM_WASM) $(TARGET_SITE_DIR)
+	cp tests/file-sample.xlsx $(TARGET_SITE_DIR)
 	cp $< $@
 site: $(TARGET_SITE)
 # ███████████████████████████████   END SITE   ███████████████████████████████
