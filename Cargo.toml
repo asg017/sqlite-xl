@@ -9,4 +9,7 @@ calamine = "0.23.1"
 thiserror = "1.0"
 
 [lib]
-crate-type = ["cdylib", "staticlib"]
+crate-type = ["lib", "cdylib", "staticlib"]
+
+[features]
+static = ["sqlite-loadable/static"]
