@@ -1,9 +1,12 @@
 use sqlite_loadable::prelude::*;
+use sqlite_loadable::scalar::scalar_function_raw;
+use sqlite_loadable::table::VTabFind;
 use sqlite_loadable::{
     api,
     table::{BestIndexError, ConstraintOperator, IndexInfo, VTab, VTabArguments, VTabCursor},
     Result,
 };
+use std::ffi::c_void;
 use std::{mem, os::raw::c_int};
 
 use calamine::{DataType, Reader};
@@ -78,6 +81,23 @@ impl<'vtab> VTab<'vtab> for RowsTable {
     fn open(&mut self) -> Result<RowsCursor> {
         Ok(RowsCursor::new())
     }
+}
+
+impl<'vtab> VTabFind<'vtab> for RowsTable {
+  fn find_function(
+      &mut self,
+      argc: i32,
+      name: &str,
+  ) -> Option<(
+      unsafe extern "C" fn(*mut sqlite3_context, i32, *mut *mut sqlite3_value),
+      Option<i32>,
+      Option<*mut c_void>,
+  )> {
+      if name == "->>" && argc == 2 {
+          return Some((scalar_function_raw(crate::xl_at), None, None));
+      }
+      None
+  }
 }
 
 #[repr(C)]
