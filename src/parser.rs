@@ -29,26 +29,26 @@ pub enum ParseCellReferenceError<'a> {
     Syntax(&'a str),
 }
 
-fn cell_location(column: &str, row: u32) -> Result<(u32, u32), ()> {
-    let column_value = {
-        let mut value: u32 = 0;
-        let mut multiplier = 1;
-        for c in column.chars().rev() {
-            if c.is_ascii_lowercase() {
-                let v: u32 = c as u32 - 'a' as u32 + 1;
-                value += v * multiplier;
-            } else if c.is_ascii_uppercase() {
-                let v: u32 = c as u32 - 'A' as u32 + 1;
-                value += v * multiplier;
-            } else {
-                panic!();
-            }
-            multiplier *= 26;
+pub fn column_name_to_idx(column_name: &str) -> Result<u32, ()> {
+    let mut value: u32 = 0;
+    let mut multiplier = 1;
+    for c in column_name.chars().rev() {
+        if c.is_ascii_lowercase() {
+            let v: u32 = c as u32 - 'a' as u32 + 1;
+            value += v * multiplier;
+        } else if c.is_ascii_uppercase() {
+            let v: u32 = c as u32 - 'A' as u32 + 1;
+            value += v * multiplier;
+        } else {
+            todo!();
         }
-        value
-    };
+        multiplier *= 26;
+    }
+    Ok(value  - 1)
+}
 
-    Ok((column_value - 1, row - 1))
+fn cell_location(column: &str, row: u32) -> Result<(u32, u32), ()> {
+    Ok((column_name_to_idx(column)?, row - 1))
 }
 
 pub fn parse_cell_reference(input: &str) -> Result<CellReference, ParseCellReferenceError> {
@@ -259,5 +259,17 @@ mod tests {
                 end: (1, 4)
             })
         );
+    }
+
+    #[test]
+    fn test_column_parsing() {
+      assert_eq!(cell_location("A", 1), Ok((0, 0)));
+      assert_eq!(cell_location("Z", 100), Ok((25, 99)));
+      assert_eq!(column_name_to_idx("A"), Ok(0));
+      assert_eq!(column_name_to_idx("a"), Ok(0));
+      assert_eq!(column_name_to_idx("Z"), Ok(25));
+      assert_eq!(column_name_to_idx("z"), Ok(25));
+      assert_eq!(column_name_to_idx("AA"), Ok(26));
+      assert_eq!(column_name_to_idx("ZFD"), Ok(17735));
     }
 }

@@ -4,13 +4,20 @@ mod rows;
 mod sheets;
 
 use calamine::{DataType, Reader};
+use parser::column_name_to_idx;
 use sqlite_loadable::{api, define_scalar_function, Result};
 use sqlite_loadable::{define_table_function, prelude::*};
 
 pub fn xl_at(context: *mut sqlite3_context, values: &[*mut sqlite3_value]) -> Result<()> {
     unsafe {
         let row: *mut Vec<DataType> = api::value_pointer(&values[0], b"ROW\0").unwrap();
-        let idx = api::value_int64(&values[1]);
+        let idx = match api::value_type(&values[1]) {
+          api::ValueType::Integer => api::value_int64(&values[1]),
+          api::ValueType::Text => {
+            column_name_to_idx(api::value_text(&values[1])?).unwrap().into()
+          }
+          _ => todo!(),
+        };
         crate::result_xl_data(context, (*row).get(idx as usize).unwrap())?;
     }
     Ok(())
