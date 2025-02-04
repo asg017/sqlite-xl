@@ -10,15 +10,17 @@ use calamine::{DataType, Reader};
 
 use crate::parser::parse_range_reference;
 
-static CREATE_SQL: &str = "CREATE TABLE x(row, workbook hidden)";
+static CREATE_SQL: &str = "CREATE TABLE x(row_number, row, workbook hidden)";
 enum Columns {
+    RowNumber,
     Row,
     Workbook,
 }
 fn column(index: i32) -> Option<Columns> {
     match index {
-        0 => Some(Columns::Row),
-        1 => Some(Columns::Workbook),
+        0 => Some(Columns::RowNumber),
+        1 => Some(Columns::Row),
+        2 => Some(Columns::Workbook),
         _ => None,
     }
 }
@@ -83,6 +85,7 @@ pub struct RowsCursor {
     /// Base class. Must be first
     base: sqlite3_vtab_cursor,
     rowid: i64,
+    start_row_number: Option<u32>,
     values: Option<Vec<Vec<DataType>>>,
 }
 impl RowsCursor {
@@ -91,6 +94,7 @@ impl RowsCursor {
         RowsCursor {
             base,
             rowid: 0,
+            start_row_number: None,
             values: None,
         }
     }
@@ -107,7 +111,10 @@ impl VTabCursor for RowsCursor {
         let data = raw.to_vec();
         let mut workbook =
             calamine::open_workbook_auto_from_rs(std::io::Cursor::new(data)).unwrap();
-        let worksheet_range = workbook.worksheet_range("Sheet1").unwrap();
+            let sheet_names = workbook.sheet_names();
+            let first_sheetname = sheet_names.first().unwrap();
+        let worksheet_range = workbook.worksheet_range(first_sheetname).unwrap();
+        self.start_row_number = Some(worksheet_range.start().unwrap().1 + 1);
         let values: Vec<Vec<DataType>> = worksheet_range.rows().map(|v| v.to_owned()).collect();
         self.values = Some(values);
         Ok(())
@@ -134,13 +141,16 @@ impl VTabCursor for RowsCursor {
             .get(self.rowid as usize)
             .unwrap();
         match column(i) {
+          Some(Columns::RowNumber) => {
+            api::result_int64(context, self.rowid + self.start_row_number.unwrap()as i64);
+          }
             Some(Columns::Row) => {
                 api::result_pointer(context, b"ROW\0", v.to_owned());
             }
             Some(Columns::Workbook) => {
                 //context_result_int(0);
             }
-            _ => (),
+            None => (),
         }
         Ok(())
     }
