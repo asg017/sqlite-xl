@@ -5,6 +5,7 @@ mod sheets;
 
 use calamine::{DataType, Reader};
 use parser::column_name_to_idx;
+use sqlite_loadable::table::define_table_function_with_find;
 use sqlite_loadable::{api, define_scalar_function, Result};
 use sqlite_loadable::{define_table_function, prelude::*};
 
@@ -49,7 +50,7 @@ pub fn xl_version(context: *mut sqlite3_context, _values: &[*mut sqlite3_value])
 pub fn sqlite3_xl_init(db: *mut sqlite3) -> Result<()> {
     define_table_function::<sheets::SheetsTable>(db, "xl_sheets", None)?;
     define_table_function::<cells::CellsTable>(db, "xl_cells", None)?;
-    define_table_function::<rows::RowsTable>(db, "xl_rows", None)?;
+    define_table_function_with_find::<rows::RowsTable>(db, "xl_rows", None)?;
     define_scalar_function(db, "xl_at", 2, xl_at, FunctionFlags::UTF8)?;
     define_scalar_function(db, "xl_version", 0, xl_version, FunctionFlags::UTF8)?;
     Ok(())

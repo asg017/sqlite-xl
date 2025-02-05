@@ -137,6 +137,7 @@ impl VTabCursor for RowsCursor {
         self.start_row_number = Some(worksheet_range.start().unwrap().1 + 1);
         let values: Vec<Vec<DataType>> = worksheet_range.rows().map(|v| v.to_owned()).collect();
         self.values = Some(values);
+        self.rowid = 0;
         Ok(())
     }
 
