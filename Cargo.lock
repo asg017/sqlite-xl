@@ -549,7 +549,7 @@ dependencies = [
 
 [[package]]
 name = "sqlite-xl"
-version = "0.0.1-alpha.3"
+version = "0.0.1-alpha.4"
 dependencies = [
  "calamine",
  "sqlite-loadable",
