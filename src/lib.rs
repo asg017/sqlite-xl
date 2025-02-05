@@ -30,7 +30,9 @@ fn result_xl_data(context: *mut sqlite3_context, data: &DataType) -> Result<()> 
         DataType::Float(value) => api::result_double(context, *value),
         DataType::String(value) => api::result_text(context, value)?,
         DataType::Bool(value) => api::result_bool(context, *value),
-        DataType::DateTime(value) => api::result_double(context, *value),
+        DataType::DateTime(_) => {
+          api::result_text(context, data.as_datetime().unwrap().to_string())?;
+        },
         DataType::Duration(value) => api::result_double(context, *value),
         DataType::DateTimeIso(value) => api::result_text(context, value)?,
         DataType::DurationIso(value) => api::result_text(context, value)?,
