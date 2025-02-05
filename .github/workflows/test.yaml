@@ -6,8 +6,19 @@ on:
 permissions:
   contents: read
 jobs:
-  build-linux-x86_64-extension:
-    runs-on: ubuntu-20.04
+  build-extension:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-20.04
+            target: linux-x86_64
+          - os: macos-13
+            target: macos-x86_64
+          - os: macos-14
+            target: macos-aarch64
+          - os: windows-2019
+            target: windows-x86_64
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions-rs/toolchain@v1
@@ -16,41 +27,5 @@ jobs:
       - run: make loadable
       - uses: actions/upload-artifact@v4
         with:
-          name: sqlite-xl-linux-x86_64-extension
-          path: dist/*
-  build-macos-x86_64-extension:
-    runs-on: macos-13
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-      - run: make loadable
-      - uses: actions/upload-artifact@v4
-        with:
-          name: sqlite-xl-macos-x86_64-extension
-          path: dist/*
-  build-macos-aarch64-extension:
-    runs-on: macos-14
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-      - run: make loadable
-      - uses: actions/upload-artifact@v4
-        with:
-          name: sqlite-xl-macos-aarch64-extension
-          path: dist/*
-  build-windows-x86_64-extension:
-    runs-on: windows-2019
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-      - run: make loadable
-      - uses: actions/upload-artifact@v4
-        with:
-          name: sqlite-xl-windows-x86_64-extension
+          name: sqlite-xl-${{ matrix.target }}-extension
           path: dist/*
