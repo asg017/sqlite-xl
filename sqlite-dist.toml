@@ -1,0 +1,21 @@
+[package]
+name = "sqlite-xl"
+license = "MIT OR Apache"
+homepage = "https://alexgarcia.xyz/sqlite-xl"
+repo = "https://github.com/asg017/sqlite-xl"
+description = "A SQLite extension for querying data from Excel files"
+authors = ["Alex Garcia"]
+git_tag_format = "v$VERSION"
+
+[targets]
+github_releases = {}
+sqlpkg = {}
+spm = {}
+
+pip = {}
+datasette = {}
+sqlite_utils = {}
+
+npm = {}
+
+gem = { module_name = "SqliteXl" }
