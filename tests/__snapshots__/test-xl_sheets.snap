@@ -1,0 +1,16 @@
+Source: ../test.sql
+select * from xl_sheets(readfile('tests/sample-abc.xlsx'));
+---
+{
+	 name: 'aaa'
+	 visible: NULL
+}
+{
+	 name: 'bbb'
+	 visible: NULL
+}
+{
+	 name: 'ccc'
+	 visible: NULL
+}
+

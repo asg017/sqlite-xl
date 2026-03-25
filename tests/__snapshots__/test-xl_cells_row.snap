@@ -1,0 +1,34 @@
+Source: ../test.sql
+select rowid, * from xl_cells(readfile('tests/file-sample.xlsx'), 'A1:F1');
+---
+{
+	 rowid: 0
+	 column_name: 'A'
+	 row_number: 1
+	 value: 'number'
+}
+{
+	 rowid: 1
+	 column_name: 'B'
+	 row_number: 1
+	 value: 'decimal'
+}
+{
+	 rowid: 2
+	 column_name: 'C'
+	 row_number: 1
+	 value: 'date'
+}
+{
+	 rowid: 3
+	 column_name: 'D'
+	 row_number: 1
+	 value: 'boolean'
+}
+{
+	 rowid: 4
+	 column_name: 'E'
+	 row_number: 1
+	 value: 'text'
+}
+

@@ -1,0 +1,81 @@
+Source: ../test.sql
+select
+  rowid,
+  row_number,
+  row,
+  row ->> 'A',
+  row ->> 'B',
+  row ->> 'C',
+  row ->> 'D',
+  row ->> 'E',
+  row ->> 'F'
+from xl_rows(readfile('tests/file-sample.xlsx'))
+limit 6;
+---
+{
+	 rowid: 0
+	 row_number: 1
+	 row: pointer[]
+	 row ->> 'A': 'number'
+	 row ->> 'B': 'decimal'
+	 row ->> 'C': 'date'
+	 row ->> 'D': 'boolean'
+	 row ->> 'E': 'text'
+	 row ->> 'F': NULL
+}
+{
+	 rowid: 1
+	 row_number: 2
+	 row: pointer[]
+	 row ->> 'A': 1
+	 row ->> 'B': 1.1
+	 row ->> 'C': '2000-01-01 00:00:00'
+	 row ->> 'D': 1
+	 row ->> 'E': 'CONTROL ROW'
+	 row ->> 'F': NULL
+}
+{
+	 rowid: 2
+	 row_number: 3
+	 row: pointer[]
+	 row ->> 'A': 2
+	 row ->> 'B': 1.2
+	 row ->> 'C': '2000-01-02 00:00:00'
+	 row ->> 'D': 0
+	 row ->> 'E': 'RANDOM TEXT:0.716658989024692'
+	 row ->> 'F': NULL
+}
+{
+	 rowid: 3
+	 row_number: 4
+	 row: pointer[]
+	 row ->> 'A': 3
+	 row ->> 'B': 1.3
+	 row ->> 'C': '2000-01-03 00:00:00'
+	 row ->> 'D': 1
+	 row ->> 'E': 'RANDOM TEXT:0.966075283958641'
+	 row ->> 'F': NULL
+}
+{
+	 rowid: 4
+	 row_number: 5
+	 row: pointer[]
+	 row ->> 'A': 4
+	 row ->> 'B': 1.4
+	 row ->> 'C': '2000-01-04 00:00:00'
+	 row ->> 'D': 0
+	 row ->> 'E': 'RANDOM TEXT:0.114332776342043'
+	 row ->> 'F': NULL
+}
+{
+	 rowid: 5
+	 row_number: 6
+	 row: pointer[]
+	 row ->> 'A': 5
+	 row ->> 'B': 1.5
+	 row ->> 'C': '2000-01-05 00:00:00'
+	 row ->> 'D': 1
+	 row ->> 'E': 'RANDOM TEXT:0.651328894028924'
+	 row ->> 'F': NULL
+}
+

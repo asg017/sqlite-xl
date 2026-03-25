@@ -1,0 +1,19 @@
+Source: ../test.sql
+select
+  row_number,
+  xl_at(row, 'A'),
+  xl_at(row, 'B')
+from xl_rows(readfile('tests/sample-abc.xlsx'), 'bbb')
+limit 3;
+---
+{
+	 row_number: 1
+	 xl_at(row, 'A'): 'brian one'
+	 xl_at(row, 'B'): NULL
+}
+{
+	 row_number: 2
+	 xl_at(row, 'A'): 'brian two'
+	 xl_at(row, 'B'): NULL
+}
+

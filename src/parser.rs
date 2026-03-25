@@ -1,5 +1,6 @@
 use thiserror::Error;
 
+#[allow(dead_code)]
 #[derive(Debug, PartialEq)]
 pub struct CellReference {
     pub location: (u32, u32),
@@ -11,11 +12,13 @@ pub struct RangeReference {
     pub end: (u32, u32),
 }
 
+#[allow(dead_code)]
 enum Reference {
     Cell(CellReference),
     Range((usize, usize)),
 }
 
+#[allow(dead_code)]
 #[derive(Error, Debug, PartialEq)]
 pub enum ParseCellReferenceError<'a> {
     #[error("the data for key `{0}` is not available")]
@@ -47,11 +50,23 @@ pub fn column_name_to_idx(column_name: &str) -> Result<u32, ()> {
     Ok(value  - 1)
 }
 
+pub fn column_idx_to_name(idx: u32) -> String {
+    let mut idx = idx + 1; // 0-based to 1-based
+    let mut name = String::new();
+    while idx > 0 {
+        let remainder = (idx - 1) % 26;
+        name.insert(0, (b'A' + remainder as u8) as char);
+        idx = (idx - 1) / 26;
+    }
+    name
+}
+
 fn cell_location(column: &str, row: u32) -> Result<(u32, u32), ()> {
     Ok((column_name_to_idx(column)?, row - 1))
 }
 
-pub fn parse_cell_reference(input: &str) -> Result<CellReference, ParseCellReferenceError> {
+#[allow(dead_code)]
+pub fn parse_cell_reference(input: &str) -> Result<CellReference, ParseCellReferenceError<'_>> {
     let tokens = tokenize(input);
     let mut tokens = tokens.iter();
     let first = tokens.next().ok_or(ParseCellReferenceError::Empty)?;
@@ -72,7 +87,7 @@ pub fn parse_cell_reference(input: &str) -> Result<CellReference, ParseCellRefer
     };
 
     Ok(CellReference {
-        location: cell_location(column, *row).map_err(|e| ParseCellReferenceError::Unknown)?,
+        location: cell_location(column, *row).map_err(|_| ParseCellReferenceError::Unknown)?,
     })
 }
 
@@ -86,7 +101,7 @@ pub enum ParseRangeReferenceError<'a> {
     Syntax(&'a str),
 }
 
-pub fn parse_range_reference(input: &str) -> Result<RangeReference, ParseRangeReferenceError> {
+pub fn parse_range_reference(input: &str) -> Result<RangeReference, ParseRangeReferenceError<'_>> {
     let tokens = tokenize(input);
     let mut tokens = tokens.iter();
     let first = tokens.next().ok_or(ParseRangeReferenceError::Empty)?;
@@ -129,8 +144,8 @@ pub fn parse_range_reference(input: &str) -> Result<RangeReference, ParseRangeRe
     };
 
     Ok(RangeReference {
-        start: cell_location(c1, *r1).map_err(|e| ParseRangeReferenceError::Unknown)?,
-        end: cell_location(c2, *r2).map_err(|e| ParseRangeReferenceError::Unknown)?,
+        start: cell_location(c1, *r1).map_err(|_| ParseRangeReferenceError::Unknown)?,
+        end: cell_location(c2, *r2).map_err(|_| ParseRangeReferenceError::Unknown)?,
     })
 }
 

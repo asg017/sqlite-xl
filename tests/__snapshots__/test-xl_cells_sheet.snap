@@ -1,0 +1,14 @@
+Source: ../test.sql
+select * from xl_cells(readfile('tests/sample-abc.xlsx'), 'A1:B3', 'bbb');
+---
+{
+	 column_name: 'A'
+	 row_number: 1
+	 value: 'brian one'
+}
+{
+	 column_name: 'A'
+	 row_number: 2
+	 value: 'brian two'
+}
+

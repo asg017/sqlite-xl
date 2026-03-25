@@ -6,25 +6,27 @@ use sqlite_loadable::{
 };
 use std::{mem, os::raw::c_int};
 
-use calamine::{DataType, Reader};
+use calamine::{Data, Reader};
 
-use crate::parser::parse_range_reference;
+use crate::parser::{column_idx_to_name, parse_range_reference};
 
-static CREATE_SQL: &str = "CREATE TABLE x(row, column, value, workbook hidden, range hidden)";
+static CREATE_SQL: &str = "CREATE TABLE x(column_name, row_number, value, workbook hidden, range hidden, sheet hidden)";
 enum Columns {
-    Row,
-    Column,
+  ColumnName,
+    RowNumber,
     Value,
     Workbook,
     Range,
+    Sheet,
 }
 fn column(index: i32) -> Option<Columns> {
     match index {
-        0 => Some(Columns::Row),
-        1 => Some(Columns::Column),
+        0 => Some(Columns::ColumnName),
+        1 => Some(Columns::RowNumber),
         2 => Some(Columns::Value),
         3 => Some(Columns::Workbook),
         4 => Some(Columns::Range),
+        5 => Some(Columns::Sheet),
         _ => None,
     }
 }
@@ -56,6 +58,7 @@ impl<'vtab> VTab<'vtab> for CellsTable {
     fn best_index(&self, mut info: IndexInfo) -> core::result::Result<(), BestIndexError> {
         let mut has_workbook = false;
         let mut has_range = false;
+        let mut has_sheet = false;
         for mut constraint in info.constraints() {
             match column(constraint.column_idx()) {
                 Some(Columns::Workbook) => {
@@ -76,6 +79,13 @@ impl<'vtab> VTab<'vtab> for CellsTable {
                         return Err(BestIndexError::Constraint);
                     }
                 }
+                Some(Columns::Sheet) => {
+                    if constraint.usable() && constraint.op() == Some(ConstraintOperator::EQ) {
+                        constraint.set_omit(true);
+                        constraint.set_argv_index(3);
+                        has_sheet = true;
+                    }
+                }
                 _ => (),
             }
         }
@@ -84,7 +94,7 @@ impl<'vtab> VTab<'vtab> for CellsTable {
         }
         info.set_estimated_cost(100000.0);
         info.set_estimated_rows(100000);
-        info.set_idxnum(1);
+        info.set_idxnum(if has_sheet { 2 } else { 1 });
 
         Ok(())
     }
@@ -99,7 +109,7 @@ pub struct CellsCursor {
     /// Base class. Must be first
     base: sqlite3_vtab_cursor,
     rowid: i64,
-    values: Option<Vec<(usize, usize, DataType)>>,
+    values: Option<Vec<(usize, usize, Data)>>,
 }
 impl CellsCursor {
     fn new() -> CellsCursor {
@@ -115,30 +125,44 @@ impl CellsCursor {
 impl VTabCursor for CellsCursor {
     fn filter(
         &mut self,
-        _idx_num: c_int,
+        idx_num: c_int,
         _idx_str: Option<&str>,
         values: &[*mut sqlite3_value],
     ) -> Result<()> {
-        let raw = api::value_blob(values.get(0).expect("1st min constraint is required"));
-        let range = api::value_text(values.get(1).unwrap()).unwrap();
+        let raw = api::value_blob(values.first().expect("1st min constraint is required"));
+        let range_str = api::value_text(values.get(1).unwrap()).unwrap();
         let data = raw.to_vec();
         let mut workbook =
             calamine::open_workbook_auto_from_rs(std::io::Cursor::new(data)).unwrap();
-        let range = parse_range_reference(range).unwrap();
-        let worksheet_range = workbook.worksheet_range("Sheet1").unwrap();
-        let values: Vec<(usize, usize, DataType)> = worksheet_range
-            .cells()
-            .filter_map(|(row, column, v)| {
-                if (row >= range.start.1 as usize && row <= range.end.1 as usize)
-                    && (column >= range.start.0 as usize && column <= range.end.0 as usize)
-                {
-                    Some((row + range.start.1 as usize, column, v.to_owned()))
-                } else {
-                    None
+        let range = parse_range_reference(range_str).unwrap();
+
+        let sheet_name = if idx_num == 2 {
+            api::value_text(values.get(2).unwrap())?.to_owned()
+        } else {
+            workbook.sheet_names().first().unwrap().clone()
+        };
+
+        let worksheet_range = workbook.worksheet_range(&sheet_name)
+            .map_err(|_| crate::Error::new_message(format!("sheet '{}' not found", sheet_name)))?;
+
+        let start_row = range.start.1 as usize;
+        let end_row = range.end.1 as usize;
+        let start_col = range.start.0 as usize;
+        let end_col = range.end.0 as usize;
+
+        let all_rows: Vec<&[Data]> = worksheet_range.rows().collect();
+        let mut values: Vec<(usize, usize, Data)> = Vec::new();
+        for row_idx in start_row..=end_row {
+            if let Some(row_data) = all_rows.get(row_idx) {
+                for col_idx in start_col..=end_col {
+                    if let Some(cell) = row_data.get(col_idx) {
+                        values.push((row_idx, col_idx, cell.to_owned()));
+                    }
                 }
-            })
-            .collect();
+            }
+        }
         self.values = Some(values);
+        self.rowid = 0;
         Ok(())
     }
 
@@ -163,11 +187,11 @@ impl VTabCursor for CellsCursor {
             .get(self.rowid as usize)
             .unwrap();
         match column(i) {
-            Some(Columns::Row) => {
-                api::result_int(context, v.0.try_into().unwrap());
+            Some(Columns::RowNumber) => {
+                api::result_int64(context, (v.0 + 1).try_into().unwrap());
             }
-            Some(Columns::Column) => {
-                api::result_int(context, v.1.try_into().unwrap());
+            Some(Columns::ColumnName) => {
+                api::result_text(context, column_idx_to_name(v.1.try_into().unwrap()))?;
             }
             Some(Columns::Value) => {
                 crate::result_xl_data(context, &v.2)?;

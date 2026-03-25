@@ -1,0 +1,12 @@
+Source: ../test.sql
+select
+  xl_at(row, 'A') as by_name,
+  xl_at(row, 0) as by_index
+from xl_rows(readfile('tests/file-sample.xlsx'))
+limit 1;
+---
+{
+	 by_name: 'number'
+	 by_index: 'number'
+}
+

@@ -1,7 +1,7 @@
 use calamine::Reader;
 use sqlite_loadable::prelude::*;
 use sqlite_loadable::{
-    api, define_table_function,
+    api,
     table::{BestIndexError, ConstraintOperator, IndexInfo, VTab, VTabArguments, VTabCursor},
     Result,
 };
@@ -50,17 +50,14 @@ impl<'vtab> VTab<'vtab> for SheetsTable {
     fn best_index(&self, mut info: IndexInfo) -> core::result::Result<(), BestIndexError> {
         let mut has_workbook = false;
         for mut constraint in info.constraints() {
-            match column(constraint.column_idx()) {
-                Some(Columns::Workbook) => {
-                    if constraint.usable() && constraint.op() == Some(ConstraintOperator::EQ) {
-                        constraint.set_omit(true);
-                        constraint.set_argv_index(1);
-                        has_workbook = true;
-                    } else {
-                        return Err(BestIndexError::Constraint);
-                    }
+            if let Some(Columns::Workbook) = column(constraint.column_idx()) {
+                if constraint.usable() && constraint.op() == Some(ConstraintOperator::EQ) {
+                    constraint.set_omit(true);
+                    constraint.set_argv_index(1);
+                    has_workbook = true;
+                } else {
+                    return Err(BestIndexError::Constraint);
                 }
-                _ => (),
             }
         }
         if !has_workbook {
@@ -103,7 +100,7 @@ impl VTabCursor for SheetsCursor {
         _idx_str: Option<&str>,
         values: &[*mut sqlite3_value],
     ) -> Result<()> {
-        let raw = api::value_blob(values.get(0).expect("1st min constraint is required"));
+        let raw = api::value_blob(values.first().expect("1st min constraint is required"));
         let data = raw.to_vec();
         self.workbook =
             Some(calamine::open_workbook_auto_from_rs(std::io::Cursor::new(data)).unwrap());
@@ -136,7 +133,7 @@ impl VTabCursor for SheetsCursor {
             Some(Columns::Name) => {
                 api::result_text(context, &m.name)?;
             }
-            Some(Columns::Visible) => {}
+            Some(Columns::Visible) => (),
             Some(Columns::Workbook) => {
                 //context_result_int(0);
             }

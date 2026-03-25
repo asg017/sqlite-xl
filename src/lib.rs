@@ -3,15 +3,19 @@ mod parser;
 mod rows;
 mod sheets;
 
-use calamine::{DataType, Reader};
+use calamine::{Data, DataType};
 use parser::column_name_to_idx;
 use sqlite_loadable::table::define_table_function_with_find;
-use sqlite_loadable::{api, define_scalar_function, Result};
+use sqlite_loadable::{api, define_scalar_function, Error, Result};
 use sqlite_loadable::{define_table_function, prelude::*};
 
 pub fn xl_at(context: *mut sqlite3_context, values: &[*mut sqlite3_value]) -> Result<()> {
-    unsafe {
-        let row: *mut Vec<DataType> = api::value_pointer(&values[0], b"ROW\0").unwrap();
+
+    let row: Option<*mut Vec<Data>> = unsafe {
+      api::value_pointer(&values[0], b"ROW\0")
+    };
+    match row {
+      Some(row)  => {
         let idx = match api::value_type(&values[1]) {
           api::ValueType::Integer => api::value_int64(&values[1]),
           api::ValueType::Text => {
@@ -19,27 +23,38 @@ pub fn xl_at(context: *mut sqlite3_context, values: &[*mut sqlite3_value]) -> Re
           }
           _ => todo!(),
         };
-        crate::result_xl_data(context, (*row).get(idx as usize).unwrap())?;
+        let value = unsafe {
+          (&(*row)).get(idx as usize)
+        };
+        match value {
+          Some(value) => crate::result_xl_data(context, value)?,
+           None => api::result_null(context),
+        }
+      }
+      None => {
+        return Err(Error::new_message("1st argument must be a row"));
+      }
     }
+    
     Ok(())
 }
 
-fn result_xl_data(context: *mut sqlite3_context, data: &DataType) -> Result<()> {
+fn result_xl_data(context: *mut sqlite3_context, data: &Data) -> Result<()> {
     match data {
-        DataType::Int(value) => api::result_int64(context, *value),
-        DataType::Float(value) => api::result_double(context, *value),
-        DataType::String(value) => api::result_text(context, value)?,
-        DataType::Bool(value) => api::result_bool(context, *value),
-        DataType::DateTime(_) => {
+        Data::Int(value) => api::result_int64(context, *value),
+        Data::Float(value) => api::result_double(context, *value),
+        Data::String(value) => api::result_text(context, value)?,
+        Data::Bool(value) => api::result_bool(context, *value),
+        Data::DateTime(_) => {
           api::result_text(context, data.as_datetime().unwrap().to_string())?;
         },
-        DataType::Duration(value) => api::result_double(context, *value),
-        DataType::DateTimeIso(value) => api::result_text(context, value)?,
-        DataType::DurationIso(value) => api::result_text(context, value)?,
-        DataType::Error(value) => {
+        //Data::Du(value) => api::result_double(context, *value),
+        Data::DateTimeIso(value) => api::result_text(context, value)?,
+        Data::DurationIso(value) => api::result_text(context, value)?,
+        Data::Error(value) => {
             api::result_text(context, format!("{value}"))?;
         }
-        DataType::Empty => api::result_null(context),
+        Data::Empty => api::result_null(context),
     }
     Ok(())
 }

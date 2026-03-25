@@ -107,15 +107,33 @@ clean:
 	rm dist/*
 	cargo clean
 
+test-snapshot: $(TARGET_LOADABLE)
+	solite-dev test -u tests/test.sql
+
+test-snapshot-watch: $(TARGET_LOADABLE) tests/test.sql
+	watchexec \
+		-w $(TARGET_LOADABLE) \
+		-w tests/test.sql \
+		--wrap-process=session --restart \
+		-- solite-dev test tests/test.sql
+
+site/api-reference.md: site/api-reference.md.in $(TARGET_LOADABLE)
+	solite-dev docs inline \
+		--extension dist/debug/xl0 \
+		site/api-reference.md.in \
+		-o $@
+
+docs: site/api-reference.md
+
 publish-release:
 	./scripts/publish_release.sh
 
 .PHONY: clean \
-	test test-loadable \
+	test test-loadable test-snapshot \
 	loadable loadable-release \
 	static static-release \
 	debug release \
-	format version publish-release
+	format version publish-release docs
 
 # ███████████████████████████████ WASM SECTION ███████████████████████████████
 
