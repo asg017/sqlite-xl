@@ -1,0 +1,64 @@
+Source: ../test.sql
+select * from xl_cells(readfile('tests/students.xlsx'), 'A1:D3', 'assignments');
+---
+{
+	 column_name: 'A'
+	 row_number: 1
+	 value: 'id'
+}
+{
+	 column_name: 'B'
+	 row_number: 1
+	 value: 'title'
+}
+{
+	 column_name: 'C'
+	 row_number: 1
+	 value: 'subject'
+}
+{
+	 column_name: 'D'
+	 row_number: 1
+	 value: 'max_score'
+}
+{
+	 column_name: 'A'
+	 row_number: 2
+	 value: 101
+}
+{
+	 column_name: 'B'
+	 row_number: 2
+	 value: 'Essay: Modern Poetry'
+}
+{
+	 column_name: 'C'
+	 row_number: 2
+	 value: 'English'
+}
+{
+	 column_name: 'D'
+	 row_number: 2
+	 value: 100
+}
+{
+	 column_name: 'A'
+	 row_number: 3
+	 value: 102
+}
+{
+	 column_name: 'B'
+	 row_number: 3
+	 value: 'Lab: Chemical Reactions'
+}
+{
+	 column_name: 'C'
+	 row_number: 3
+	 value: 'Science'
+}
+{
+	 column_name: 'D'
+	 row_number: 3
+	 value: 50
+}
+

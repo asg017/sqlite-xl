@@ -1,0 +1,16 @@
+Source: ../test.sql
+select * from xl_sheets(readfile('tests/students.xlsx'));
+---
+{
+	 name: 'students'
+	 visible: NULL
+}
+{
+	 name: 'assignments'
+	 visible: NULL
+}
+{
+	 name: 'grades'
+	 visible: NULL
+}
+

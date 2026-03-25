@@ -1,0 +1,40 @@
+Source: ../test.sql
+select
+  xl_at(row, 'A') as id,
+  xl_at(row, 'B') as name,
+  xl_at(row, 'C') as grade_level,
+  xl_at(row, 'D') as email
+from xl_rows(readfile('tests/students.xlsx'), 'students')
+where row_number > 1;
+---
+{
+	 id: 1
+	 name: 'Alice Chen'
+	 grade_level: 10
+	 email: 'alice@school.edu'
+}
+{
+	 id: 2
+	 name: 'Bob Jones'
+	 grade_level: 11
+	 email: 'bob@school.edu'
+}
+{
+	 id: 3
+	 name: 'Clara Smith'
+	 grade_level: 10
+	 email: 'clara@school.edu'
+}
+{
+	 id: 4
+	 name: 'David Kim'
+	 grade_level: 12
+	 email: 'david@school.edu'
+}
+{
+	 id: 5
+	 name: 'Eva Lopez'
+	 grade_level: 11
+	 email: 'eva@school.edu'
+}
+

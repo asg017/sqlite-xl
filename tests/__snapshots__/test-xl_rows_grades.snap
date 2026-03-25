@@ -1,0 +1,41 @@
+Source: ../test.sql
+select
+  xl_at(row, 'A') as student_id,
+  xl_at(row, 'B') as assignment_id,
+  xl_at(row, 'C') as score,
+  xl_at(row, 'D') as submitted
+from xl_rows(readfile('tests/students.xlsx'), 'grades')
+where row_number > 1
+limit 5;
+---
+{
+	 student_id: 1
+	 assignment_id: 101
+	 score: 92
+	 submitted: '2025-03-10'
+}
+{
+	 student_id: 1
+	 assignment_id: 102
+	 score: 47
+	 submitted: '2025-03-12'
+}
+{
+	 student_id: 1
+	 assignment_id: 103
+	 score: 71
+	 submitted: '2025-03-15'
+}
+{
+	 student_id: 2
+	 assignment_id: 101
+	 score: 85
+	 submitted: '2025-03-11'
+}
+{
+	 student_id: 2
+	 assignment_id: 102
+	 score: 44
+	 submitted: '2025-03-12'
+}
+

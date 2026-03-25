@@ -27,20 +27,23 @@ Extracts a cell value from a `row` pointer returned by `xl_rows()`. The `column`
 
 ```sql
 select
-  xl_at(row, 'A') as by_name,
-  xl_at(row, 0) as by_index
-from xl_rows(readfile('tests/file-sample.xlsx'))
-limit 1;
+  xl_at(row, 'A') as id,
+  xl_at(row, 'B') as name,
+  xl_at(row, 'C') as grade_level
+from xl_rows(readfile('tests/students.xlsx'), 'students')
+where row_number > 1
+limit 3;
 ```
 
 You can also use the `->>` operator as a shorthand for `xl_at()` when querying `xl_rows()`:
 
 ```sql
 select
-  row ->> 'A',
-  row ->> 'B'
-from xl_rows(readfile('tests/file-sample.xlsx'))
-limit 1;
+  row ->> 'A' as id,
+  row ->> 'B' as title,
+  row ->> 'C' as subject
+from xl_rows(readfile('tests/students.xlsx'), 'assignments')
+where row_number > 1;
 ```
 
 ## Table Functions
@@ -50,7 +53,7 @@ limit 1;
 Lists all sheets in a workbook.
 
 ```sql
-select * from xl_sheets(readfile('tests/sample-abc.xlsx'));
+select * from xl_sheets(readfile('tests/students.xlsx'));
 ```
 
 ### `xl_rows(workbook)`
@@ -62,21 +65,25 @@ By default, reads the first sheet.
 ```sql
 select
   row_number,
-  xl_at(row, 'A'),
-  xl_at(row, 'B'),
-  xl_at(row, 'C')
-from xl_rows(readfile('tests/file-sample.xlsx'))
-limit 3;
+  xl_at(row, 'A') as id,
+  xl_at(row, 'B') as name,
+  xl_at(row, 'C') as grade_level,
+  xl_at(row, 'D') as email
+from xl_rows(readfile('tests/students.xlsx'))
+limit 4;
 ```
 
 To read a specific sheet, pass the sheet name as the second argument:
 
 ```sql
 select
-  row_number,
-  xl_at(row, 'A')
-from xl_rows(readfile('tests/sample-abc.xlsx'), 'bbb')
-limit 3;
+  xl_at(row, 'A') as student_id,
+  xl_at(row, 'B') as assignment_id,
+  xl_at(row, 'C') as score,
+  xl_at(row, 'D') as submitted
+from xl_rows(readfile('tests/students.xlsx'), 'grades')
+where row_number > 1
+limit 5;
 ```
 
 ### `xl_cells(workbook, range)`
@@ -84,11 +91,11 @@ limit 3;
 Returns individual cells in an unpivoted format, filtered to a given range. Each row contains `column_name`, `row_number`, and `value`.
 
 ```sql
-select * from xl_cells(readfile('tests/file-sample.xlsx'), 'A1:C2');
+select * from xl_cells(readfile('tests/students.xlsx'), 'A1:D3');
 ```
 
 To read from a specific sheet, pass the sheet name as the third argument:
 
 ```sql
-select * from xl_cells(readfile('tests/sample-abc.xlsx'), 'A1:B3', 'bbb');
+select * from xl_cells(readfile('tests/students.xlsx'), 'A1:C3', 'assignments');
 ```
