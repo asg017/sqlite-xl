@@ -1,4 +1,4 @@
-Source: ../test.sql
+Source: ../api.sql
 select * from xl_cells(readfile('tests/sample-abc.xlsx'), 'A1:B3', 'bbb');
 ---
 {

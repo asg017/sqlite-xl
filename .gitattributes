@@ -1,0 +1,7 @@
+# solite docgen writes LF; a CRLF checkout on windows makes `make docs-check`
+# see every executed line as changed
+site/api-reference.md text eol=lf
+
+# force LF so snapshot comparisons match across platforms
+tests/api.sql text eol=lf
+tests/__snapshots__/*.snap text eol=lf

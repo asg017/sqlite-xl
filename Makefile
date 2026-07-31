@@ -107,33 +107,47 @@ clean:
 	rm dist/*
 	cargo clean
 
-test-snapshot: $(TARGET_LOADABLE)
-	solite-dev test -u tests/test.sql
+SOLITE=solite
 
-test-snapshot-watch: $(TARGET_LOADABLE) tests/test.sql
+TESTS=tests/api.sql
+
+test-api: $(TARGET_LOADABLE)
+	$(SOLITE) test $(TESTS)
+
+test-api-snapshot-update: $(TARGET_LOADABLE)
+	$(SOLITE) test $(TESTS) --update
+
+test-api-review: $(TARGET_LOADABLE)
+	$(SOLITE) test $(TESTS) --review
+
+test-api-watch: $(TARGET_LOADABLE)
 	watchexec \
+		--clear \
+		--stop-timeout=0 \
 		-w $(TARGET_LOADABLE) \
-		-w tests/test.sql \
-		--wrap-process=session --restart \
-		-- solite-dev test tests/test.sql
+		-w $(TESTS) \
+		-- \
+		make test-api-review
 
-site/api-reference.md: site/api-reference.md.in $(TARGET_LOADABLE)
-	solite-dev docs inline \
-		--extension dist/debug/xl0 \
-		site/api-reference.md.in \
-		-o $@
+SOLITE_DOCGEN=$(SOLITE) docgen
 
-docs: site/api-reference.md
+# Re-execute the ```sql code blocks in site/api-reference.md and inline their
+# results in place. Fails if any extension function is undocumented.
+docs: $(TARGET_LOADABLE)
+	$(SOLITE_DOCGEN) --extension $(TARGET_LOADABLE) site/api-reference.md -o site/api-reference.md
+
+docs-check: $(TARGET_LOADABLE)
+	$(SOLITE_DOCGEN) --extension $(TARGET_LOADABLE) site/api-reference.md --check
 
 publish-release:
 	./scripts/publish_release.sh
 
 .PHONY: clean \
-	test test-loadable test-snapshot \
+	test-api test-api-snapshot-update test-api-review test-api-watch \
 	loadable loadable-release \
 	static static-release \
 	debug release \
-	format version publish-release docs
+	format version publish-release docs docs-check
 
 # ███████████████████████████████ WASM SECTION ███████████████████████████████
 

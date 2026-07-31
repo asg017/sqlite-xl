@@ -1,4 +1,4 @@
-Source: ../test.sql
+Source: ../api.sql
 select * from xl_cells(readfile('tests/students.xlsx'), 'A1:D3', 'assignments');
 ---
 {
@@ -24,7 +24,7 @@ select * from xl_cells(readfile('tests/students.xlsx'), 'A1:D3', 'assignments');
 {
 	 column_name: 'A'
 	 row_number: 2
-	 value: 101
+	 value: 101.0
 }
 {
 	 column_name: 'B'
@@ -39,12 +39,12 @@ select * from xl_cells(readfile('tests/students.xlsx'), 'A1:D3', 'assignments');
 {
 	 column_name: 'D'
 	 row_number: 2
-	 value: 100
+	 value: 100.0
 }
 {
 	 column_name: 'A'
 	 row_number: 3
-	 value: 102
+	 value: 102.0
 }
 {
 	 column_name: 'B'
@@ -59,6 +59,6 @@ select * from xl_cells(readfile('tests/students.xlsx'), 'A1:D3', 'assignments');
 {
 	 column_name: 'D'
 	 row_number: 3
-	 value: 50
+	 value: 50.0
 }
 

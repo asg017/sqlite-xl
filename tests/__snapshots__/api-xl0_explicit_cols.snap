@@ -1,0 +1,34 @@
+Source: ../api.sql
+select * from temp.grades limit 5;
+---
+{
+	 student_id: 1.0
+	 assignment_id: 101.0
+	 score: 92.0
+	 submitted: '2025-03-10 14:30:00'
+}
+{
+	 student_id: 1.0
+	 assignment_id: 102.0
+	 score: 47.0
+	 submitted: '2025-03-12 09:15:00'
+}
+{
+	 student_id: 1.0
+	 assignment_id: 103.0
+	 score: 71.0
+	 submitted: '2025-03-15 22:00:00'
+}
+{
+	 student_id: 2.0
+	 assignment_id: 101.0
+	 score: 85.0
+	 submitted: '2025-03-11 16:45:00'
+}
+{
+	 student_id: 2.0
+	 assignment_id: 102.0
+	 score: 44.0
+	 submitted: '2025-03-12 10:00:00'
+}
+

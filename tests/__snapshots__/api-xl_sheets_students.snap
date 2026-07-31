@@ -1,4 +1,4 @@
-Source: ../test.sql
+Source: ../api.sql
 select * from xl_sheets(readfile('tests/students.xlsx'));
 ---
 {

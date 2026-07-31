@@ -1,4 +1,4 @@
-Source: ../test.sql
+Source: ../api.sql
 select
   xl_at(row, 'A') as id,
   xl_at(row, 'B') as name,
@@ -8,33 +8,33 @@ from xl_rows(readfile('tests/students.xlsx'), 'students')
 where row_number > 1;
 ---
 {
-	 id: 1
+	 id: 1.0
 	 name: 'Alice Chen'
-	 grade_level: 10
+	 grade_level: 10.0
 	 email: 'alice@school.edu'
 }
 {
-	 id: 2
+	 id: 2.0
 	 name: 'Bob Jones'
-	 grade_level: 11
+	 grade_level: 11.0
 	 email: 'bob@school.edu'
 }
 {
-	 id: 3
+	 id: 3.0
 	 name: 'Clara Smith'
-	 grade_level: 10
+	 grade_level: 10.0
 	 email: 'clara@school.edu'
 }
 {
-	 id: 4
+	 id: 4.0
 	 name: 'David Kim'
-	 grade_level: 12
+	 grade_level: 12.0
 	 email: 'david@school.edu'
 }
 {
-	 id: 5
+	 id: 5.0
 	 name: 'Eva Lopez'
-	 grade_level: 11
+	 grade_level: 11.0
 	 email: 'eva@school.edu'
 }
 

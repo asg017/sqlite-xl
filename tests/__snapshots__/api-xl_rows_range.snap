@@ -1,4 +1,4 @@
-Source: ../test.sql
+Source: ../api.sql
 select
   xl_at(row, 'A') as student_id,
   xl_at(row, 'D') as submitted,
@@ -7,17 +7,17 @@ from xl_rows(readfile('tests/students.xlsx'), 'grades!A2:E4')
 limit 5;
 ---
 {
-	 student_id: 1
+	 student_id: 1.0
 	 submitted: '2025-03-10 14:30:00'
 	 time_spent: '01:45:00'
 }
 {
-	 student_id: 1
+	 student_id: 1.0
 	 submitted: '2025-03-12 09:15:00'
 	 time_spent: '00:50:00'
 }
 {
-	 student_id: 1
+	 student_id: 1.0
 	 submitted: '2025-03-15 22:00:00'
 	 time_spent: '02:10:00'
 }

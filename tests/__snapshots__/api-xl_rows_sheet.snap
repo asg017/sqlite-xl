@@ -1,4 +1,4 @@
-Source: ../test.sql
+Source: ../api.sql
 select
   row_number,
   xl_at(row, 'A'),

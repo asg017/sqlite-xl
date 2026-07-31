@@ -1,4 +1,4 @@
-Source: ../test.sql
+Source: ../api.sql
 select rowid, * from xl_cells(readfile('tests/file-sample.xlsx'), 'A1:F1');
 ---
 {

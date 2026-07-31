@@ -35,13 +35,13 @@ from xl_rows(readfile('tests/students.xlsx'), 'students')
 where row_number > 1
 limit 3;
 /*
-┌────┬───────────────┬─────────────┐
-│ id │ name          │ grade_level │
-├────┼───────────────┼─────────────┤
-│ 1  │ 'Alice Chen'  │ 10          │
-│ 2  │ 'Bob Jones'   │ 11          │
-│ 3  │ 'Clara Smith' │ 10          │
-└────┴───────────────┴─────────────┘
+┌─────┬───────────────┬─────────────┐
+│ id  │ name          │ grade_level │
+├─────┼───────────────┼─────────────┤
+│ 1.0 │ 'Alice Chen'  │ 10.0        │
+│ 2.0 │ 'Bob Jones'   │ 11.0        │
+│ 3.0 │ 'Clara Smith' │ 10.0        │
+└─────┴───────────────┴─────────────┘
 */
 ```
 
@@ -55,15 +55,26 @@ select
 from xl_rows(readfile('tests/students.xlsx'), 'assignments')
 where row_number > 1;
 /*
-┌─────┬───────────────────────────┬───────────┐
-│ id  │ title                     │ subject   │
-├─────┼───────────────────────────┼───────────┤
-│ 101 │ 'Essay: Modern Poetry'    │ 'English' │
-│ 102 │ 'Lab: Chemical Reactions' │ 'Science' │
-│ 103 │ 'Problem Set 5'           │ 'Math'    │
-│ 104 │ 'History Presentation'    │ 'History' │
-└─────┴───────────────────────────┴───────────┘
+┌───────┬───────────────────────────┬───────────┐
+│ id    │ title                     │ subject   │
+├───────┼───────────────────────────┼───────────┤
+│ 101.0 │ 'Essay: Modern Poetry'    │ 'English' │
+│ 102.0 │ 'Lab: Chemical Reactions' │ 'Science' │
+│ 103.0 │ 'Problem Set 5'           │ 'Math'    │
+│ 104.0 │ 'History Presentation'    │ 'History' │
+└───────┴───────────────────────────┴───────────┘
 */
+```
+
+### `xl_valid(workbook)` {#xl_valid}
+
+Returns `1` if the given blob is a workbook that `sqlite-xl` can read, `0` otherwise.
+
+```sql
+select xl_valid(readfile('tests/students.xlsx'));
+-- 1
+select xl_valid(X'0102');
+-- 0
 ```
 
 ## Table Functions
@@ -105,9 +116,9 @@ limit 4;
 │ row_number │ id   │ name          │ grade_level   │ email              │
 ├────────────┼──────┼───────────────┼───────────────┼────────────────────┤
 │ 1          │ 'id' │ 'name'        │ 'grade_level' │ 'email'            │
-│ 2          │ 1    │ 'Alice Chen'  │ 10            │ 'alice@school.edu' │
-│ 3          │ 2    │ 'Bob Jones'   │ 11            │ 'bob@school.edu'   │
-│ 4          │ 3    │ 'Clara Smith' │ 10            │ 'clara@school.edu' │
+│ 2          │ 1.0  │ 'Alice Chen'  │ 10.0          │ 'alice@school.edu' │
+│ 3          │ 2.0  │ 'Bob Jones'   │ 11.0          │ 'bob@school.edu'   │
+│ 4          │ 3.0  │ 'Clara Smith' │ 10.0          │ 'clara@school.edu' │
 └────────────┴──────┴───────────────┴───────────────┴────────────────────┘
 */
 ```
@@ -127,11 +138,11 @@ limit 5;
 ┌────────────┬───────────────┬───────┬───────────────────────┐
 │ student_id │ assignment_id │ score │ submitted             │
 ├────────────┼───────────────┼───────┼───────────────────────┤
-│ 1          │ 101           │ 92    │ '2025-03-10 14:30:00' │
-│ 1          │ 102           │ 47    │ '2025-03-12 09:15:00' │
-│ 1          │ 103           │ 71    │ '2025-03-15 22:00:00' │
-│ 2          │ 101           │ 85    │ '2025-03-11 16:45:00' │
-│ 2          │ 102           │ 44    │ '2025-03-12 10:00:00' │
+│ 1.0        │ 101.0         │ 92.0  │ '2025-03-10 14:30:00' │
+│ 1.0        │ 102.0         │ 47.0  │ '2025-03-12 09:15:00' │
+│ 1.0        │ 103.0         │ 71.0  │ '2025-03-15 22:00:00' │
+│ 2.0        │ 101.0         │ 85.0  │ '2025-03-11 16:45:00' │
+│ 2.0        │ 102.0         │ 44.0  │ '2025-03-12 10:00:00' │
 └────────────┴───────────────┴───────┴───────────────────────┘
 */
 ```
@@ -148,9 +159,9 @@ from xl_rows(readfile('tests/students.xlsx'), 'grades!A2:E4');
 ┌────────────┬───────────────────────┬────────────┐
 │ student_id │ submitted             │ time_spent │
 ├────────────┼───────────────────────┼────────────┤
-│ 1          │ '2025-03-10 14:30:00' │ '01:45:00' │
-│ 1          │ '2025-03-12 09:15:00' │ '00:50:00' │
-│ 1          │ '2025-03-15 22:00:00' │ '02:10:00' │
+│ 1.0        │ '2025-03-10 14:30:00' │ '01:45:00' │
+│ 1.0        │ '2025-03-12 09:15:00' │ '00:50:00' │
+│ 1.0        │ '2025-03-15 22:00:00' │ '02:10:00' │
 └────────────┴───────────────────────┴────────────┘
 */
 ```
@@ -169,13 +180,13 @@ select * from xl_cells(readfile('tests/students.xlsx'), 'A1:D3');
 │ 'B'         │ 1          │ 'name'             │
 │ 'C'         │ 1          │ 'grade_level'      │
 │ 'D'         │ 1          │ 'email'            │
-│ 'A'         │ 2          │ 1                  │
+│ 'A'         │ 2          │ 1.0                │
 │ 'B'         │ 2          │ 'Alice Chen'       │
-│ 'C'         │ 2          │ 10                 │
+│ 'C'         │ 2          │ 10.0               │
 │ 'D'         │ 2          │ 'alice@school.edu' │
-│ 'A'         │ 3          │ 2                  │
+│ 'A'         │ 3          │ 2.0                │
 │ 'B'         │ 3          │ 'Bob Jones'        │
-│ 'C'         │ 3          │ 11                 │
+│ 'C'         │ 3          │ 11.0               │
 │ 'D'         │ 3          │ 'bob@school.edu'   │
 └─────────────┴────────────┴────────────────────┘
 */
@@ -192,10 +203,10 @@ select * from xl_cells(readfile('tests/students.xlsx'), 'A1:C3', 'assignments');
 │ 'A'         │ 1          │ 'id'                      │
 │ 'B'         │ 1          │ 'title'                   │
 │ 'C'         │ 1          │ 'subject'                 │
-│ 'A'         │ 2          │ 101                       │
+│ 'A'         │ 2          │ 101.0                     │
 │ 'B'         │ 2          │ 'Essay: Modern Poetry'    │
 │ 'C'         │ 2          │ 'English'                 │
-│ 'A'         │ 3          │ 102                       │
+│ 'A'         │ 3          │ 102.0                     │
 │ 'B'         │ 3          │ 'Lab: Chemical Reactions' │
 │ 'C'         │ 3          │ 'Science'                 │
 └─────────────┴────────────┴───────────────────────────┘
@@ -226,16 +237,15 @@ create virtual table temp.students using xl0(
   range="students!A1:F*",
   headers=1
 );
-
 select id, name, enrollment_date, birth_date from temp.students limit 3;
 /*
-┌────┬───────────────┬─────────────────┬──────────────┐
-│ id │ name          │ enrollment_date │ birth_date   │
-├────┼───────────────┼─────────────────┼──────────────┤
-│ 1  │ 'Alice Chen'  │ '2023-08-21'    │ '2009-04-15' │
-│ 2  │ 'Bob Jones'   │ '2022-08-22'    │ '2008-11-03' │
-│ 3  │ 'Clara Smith' │ '2023-08-21'    │ '2009-07-28' │
-└────┴───────────────┴─────────────────┴──────────────┘
+┌─────┬───────────────┬─────────────────┬──────────────┐
+│ id  │ name          │ enrollment_date │ birth_date   │
+├─────┼───────────────┼─────────────────┼──────────────┤
+│ 1.0 │ 'Alice Chen'  │ '2023-08-21'    │ '2009-04-15' │
+│ 2.0 │ 'Bob Jones'   │ '2022-08-22'    │ '2008-11-03' │
+│ 3.0 │ 'Clara Smith' │ '2023-08-21'    │ '2009-07-28' │
+└─────┴───────────────┴─────────────────┴──────────────┘
 */
 ```
 
@@ -251,7 +261,6 @@ create virtual table temp.grades using xl0(
   submitted text,
   time_spent text
 );
-
 select * from temp.grades limit 5;
 /*
 ┌────────────┬───────────────┬───────┬───────────────────────┬────────────┐
@@ -273,7 +282,6 @@ create virtual table temp.raw using xl0(
   filename="tests/sample-abc.xlsx",
   range="A1:A2"
 );
-
 select * from temp.raw;
 /*
 ┌────────────┐

@@ -1,4 +1,4 @@
-Source: ../test.sql
+Source: ../api.sql
 select *, typeof(student_id), typeof(score), typeof(time_spent)
 from temp.grades_typed limit 3;
 ---

@@ -1,4 +1,4 @@
-Source: ../test.sql
+Source: ../api.sql
 select
   xl_at(row, 'A') as student_id,
   xl_at(row, 'B') as assignment_id,
@@ -9,33 +9,33 @@ where row_number > 1
 limit 5;
 ---
 {
-	 student_id: 1
-	 assignment_id: 101
-	 score: 92
+	 student_id: 1.0
+	 assignment_id: 101.0
+	 score: 92.0
 	 submitted: '2025-03-10 14:30:00'
 }
 {
-	 student_id: 1
-	 assignment_id: 102
-	 score: 47
+	 student_id: 1.0
+	 assignment_id: 102.0
+	 score: 47.0
 	 submitted: '2025-03-12 09:15:00'
 }
 {
-	 student_id: 1
-	 assignment_id: 103
-	 score: 71
+	 student_id: 1.0
+	 assignment_id: 103.0
+	 score: 71.0
 	 submitted: '2025-03-15 22:00:00'
 }
 {
-	 student_id: 2
-	 assignment_id: 101
-	 score: 85
+	 student_id: 2.0
+	 assignment_id: 101.0
+	 score: 85.0
 	 submitted: '2025-03-11 16:45:00'
 }
 {
-	 student_id: 2
-	 assignment_id: 102
-	 score: 44
+	 student_id: 2.0
+	 assignment_id: 102.0
+	 score: 44.0
 	 submitted: '2025-03-12 10:00:00'
 }
 

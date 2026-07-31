@@ -1,4 +1,4 @@
-Source: ../test.sql
+Source: ../api.sql
 select rowid, * from xl_cells(readfile('tests/file-sample.xlsx'), 'A1:E2');
 ---
 {
@@ -35,7 +35,7 @@ select rowid, * from xl_cells(readfile('tests/file-sample.xlsx'), 'A1:E2');
 	 rowid: 5
 	 column_name: 'A'
 	 row_number: 2
-	 value: 1
+	 value: 1.0
 }
 {
 	 rowid: 6
