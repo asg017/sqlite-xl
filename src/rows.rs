@@ -11,6 +11,8 @@ use std::{mem, os::raw::c_int};
 
 use calamine::{Data, Reader};
 
+use crate::sheet_range::{parse_sheet_reference, SheetTarget};
+
 static CREATE_SQL: &str = "CREATE TABLE x(row_number, row, workbook hidden, sheet hidden)";
 enum Columns {
     RowNumber,
@@ -140,18 +142,46 @@ impl VTabCursor for RowsCursor {
         let raw = api::value_blob(values.first().expect("1st min constraint is required"));
         let data = raw.to_vec();
         let mut workbook =
-            calamine::open_workbook_auto_from_rs(std::io::Cursor::new(data)).unwrap();
+            calamine::open_workbook_auto_from_rs(std::io::Cursor::new(data))
+                .map_err(|e| sqlite_loadable::Error::new_message(format!("cannot open workbook: {e}")))?;
 
-        let sheet_name = if idx_num == 2 {
-            api::value_text(values.get(1).unwrap())?.to_owned()
+        // Parse the optional second argument: can be a plain sheet name,
+        // or a sheet-qualified reference like 'Sheet1!A13:*'
+        let (sheet_name, start_row, end_row) = if idx_num == 2 {
+            let arg = api::value_text(values.get(1).unwrap())?;
+            match parse_sheet_reference(arg) {
+                Ok(ref parsed) if parsed.sheet.is_some() => {
+                    let sheet = parsed.sheet.clone().unwrap();
+                    let (sr, er) = match &parsed.target {
+                        SheetTarget::Range(r) => (Some(r.start.1), Some(r.end.1)),
+                        SheetTarget::OpenRange(r) => (r.start.row, r.end.row),
+                        SheetTarget::Cell(c) => (Some(c.location.1), Some(c.location.1)),
+                    };
+                    (sheet, sr, er)
+                }
+                _ => {
+                    // No '!' found or parse failed — treat as plain sheet name
+                    (arg.to_owned(), None, None)
+                }
+            }
         } else {
-            workbook.sheet_names().first().unwrap().clone()
+            (workbook.sheet_names().first().unwrap().clone(), None, None)
         };
 
         let worksheet_range = workbook.worksheet_range(&sheet_name)
             .map_err(|_| sqlite_loadable::Error::new_message(format!("sheet '{}' not found", sheet_name)))?;
-        self.start_row_number = Some(worksheet_range.start().unwrap().1 + 1);
-        let values: Vec<Vec<Data>> = worksheet_range.rows().map(|v| v.to_owned()).collect();
+        let ws_start_row = worksheet_range.start().map(|(_, r)| r).unwrap_or(0);
+
+        // Apply row bounds from the parsed range
+        let skip = start_row.map(|sr| sr.saturating_sub(ws_start_row) as usize).unwrap_or(0);
+        let take = end_row.map(|er| (er.saturating_sub(ws_start_row) as usize) + 1 - skip);
+
+        self.start_row_number = Some(ws_start_row + skip as u32 + 1);
+        let iter = worksheet_range.rows().skip(skip);
+        let values: Vec<Vec<Data>> = match take {
+            Some(n) => iter.take(n).map(|v| v.to_owned()).collect(),
+            None => iter.map(|v| v.to_owned()).collect(),
+        };
         self.values = Some(values);
         self.rowid = 0;
         Ok(())

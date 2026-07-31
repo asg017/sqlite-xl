@@ -69,3 +69,11 @@ select * from xl_cells(readfile('tests/sample-abc.xlsx'), 'A1:B3', 'bbb'); -- @s
 
 -- xl_cells: assignments sheet
 select * from xl_cells(readfile('tests/students.xlsx'), 'A1:D3', 'assignments'); -- @snap xl_cells_assignments
+
+-- xl_rows: sheet!range syntax with row bounds
+select
+  xl_at(row, 'A') as student_id,
+  xl_at(row, 'D') as submitted,
+  xl_at(row, 'E') as time_spent
+from xl_rows(readfile('tests/students.xlsx'), 'grades!A2:E4')
+limit 5; -- @snap xl_rows_range

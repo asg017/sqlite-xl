@@ -1,6 +1,7 @@
 mod cells;
 mod parser;
 mod rows;
+mod sheet_range;
 mod sheets;
 
 use calamine::{Data, DataType};

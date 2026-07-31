@@ -136,6 +136,25 @@ limit 5;
 */
 ```
 
+You can also use `Sheet!Range` syntax to select a sheet and filter rows in one argument:
+
+```sql
+select
+  xl_at(row, 'A') as student_id,
+  xl_at(row, 'D') as submitted,
+  xl_at(row, 'E') as time_spent
+from xl_rows(readfile('tests/students.xlsx'), 'grades!A2:E4');
+/*
+┌────────────┬───────────────────────┬────────────┐
+│ student_id │ submitted             │ time_spent │
+├────────────┼───────────────────────┼────────────┤
+│ 1          │ '2025-03-10 14:30:00' │ '01:45:00' │
+│ 1          │ '2025-03-12 09:15:00' │ '00:50:00' │
+│ 1          │ '2025-03-15 22:00:00' │ '02:10:00' │
+└────────────┴───────────────────────┴────────────┘
+*/
+```
+
 ### `xl_cells(workbook, range)` {#xl_cells}
 
 Returns individual cells in an unpivoted format, filtered to a given range. Each row contains `column_name`, `row_number`, and `value`.

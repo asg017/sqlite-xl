@@ -8,7 +8,8 @@ use std::{mem, os::raw::c_int};
 
 use calamine::{Data, Reader};
 
-use crate::parser::{column_idx_to_name, parse_range_reference};
+use crate::parser::column_idx_to_name;
+use crate::sheet_range::{parse_sheet_reference, SheetTarget};
 
 static CREATE_SQL: &str = "CREATE TABLE x(column_name, row_number, value, workbook hidden, range hidden, sheet hidden)";
 enum Columns {
@@ -133,10 +134,15 @@ impl VTabCursor for CellsCursor {
         let range_str = api::value_text(values.get(1).unwrap()).unwrap();
         let data = raw.to_vec();
         let mut workbook =
-            calamine::open_workbook_auto_from_rs(std::io::Cursor::new(data)).unwrap();
-        let range = parse_range_reference(range_str).unwrap();
+            calamine::open_workbook_auto_from_rs(std::io::Cursor::new(data))
+                .map_err(|e| crate::Error::new_message(format!("cannot open workbook: {e}")))?;
+        let parsed = parse_sheet_reference(range_str)
+            .map_err(|e| crate::Error::new_message(format!("invalid range: {e}")))?;
 
-        let sheet_name = if idx_num == 2 {
+        // Use sheet from parsed reference, then explicit 3rd arg, then default to first sheet
+        let sheet_name = if let Some(ref s) = parsed.sheet {
+            s.clone()
+        } else if idx_num == 2 {
             api::value_text(values.get(2).unwrap())?.to_owned()
         } else {
             workbook.sheet_names().first().unwrap().clone()
@@ -145,12 +151,27 @@ impl VTabCursor for CellsCursor {
         let worksheet_range = workbook.worksheet_range(&sheet_name)
             .map_err(|_| crate::Error::new_message(format!("sheet '{}' not found", sheet_name)))?;
 
-        let start_row = range.start.1 as usize;
-        let end_row = range.end.1 as usize;
-        let start_col = range.start.0 as usize;
-        let end_col = range.end.0 as usize;
-
         let all_rows: Vec<&[Data]> = worksheet_range.rows().collect();
+        let total_rows = all_rows.len();
+        let max_cols = all_rows.iter().map(|r| r.len()).max().unwrap_or(0);
+
+        // Resolve bounds from the parsed target
+        let (start_col, start_row, end_col, end_row) = match parsed.target {
+            SheetTarget::Range(r) => {
+                (r.start.0 as usize, r.start.1 as usize, r.end.0 as usize, r.end.1 as usize)
+            }
+            SheetTarget::OpenRange(r) => {
+                let sc = r.start.col.unwrap_or(0) as usize;
+                let sr = r.start.row.unwrap_or(0) as usize;
+                let ec = r.end.col.map(|c| c as usize).unwrap_or_else(|| max_cols.saturating_sub(1));
+                let er = r.end.row.map(|r| r as usize).unwrap_or_else(|| total_rows.saturating_sub(1));
+                (sc, sr, ec, er)
+            }
+            SheetTarget::Cell(c) => {
+                (c.location.0 as usize, c.location.1 as usize, c.location.0 as usize, c.location.1 as usize)
+            }
+        };
+
         let mut values: Vec<(usize, usize, Data)> = Vec::new();
         for row_idx in start_row..=end_row {
             if let Some(row_data) = all_rows.get(row_idx) {
