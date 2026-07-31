@@ -1,0 +1,34 @@
+Source: ../test.sql
+select * from temp.students;
+---
+{
+	 id: 1
+	 name: 'Alice Chen'
+	 grade_level: 10
+	 email: 'alice@school.edu'
+}
+{
+	 id: 2
+	 name: 'Bob Jones'
+	 grade_level: 11
+	 email: 'bob@school.edu'
+}
+{
+	 id: 3
+	 name: 'Clara Smith'
+	 grade_level: 10
+	 email: 'clara@school.edu'
+}
+{
+	 id: 4
+	 name: 'David Kim'
+	 grade_level: 12
+	 email: 'david@school.edu'
+}
+{
+	 id: 5
+	 name: 'Eva Lopez'
+	 grade_level: 11
+	 email: 'eva@school.edu'
+}
+

@@ -1,0 +1,10 @@
+Source: ../test.sql
+select * from temp.abc_raw;
+---
+{
+	 A: 'alex one'
+}
+{
+	 A: 'alex two'
+}
+

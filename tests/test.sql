@@ -77,3 +77,49 @@ select
   xl_at(row, 'E') as time_spent
 from xl_rows(readfile('tests/students.xlsx'), 'grades!A2:E4')
 limit 5; -- @snap xl_rows_range
+
+-- ═══════════════════════════════════════════
+-- xl0: CREATE VIRTUAL TABLE
+-- ═══════════════════════════════════════════
+
+-- xl0: auto column names (no headers, no explicit names)
+create virtual table temp.abc_raw using xl0(
+  filename="tests/sample-abc.xlsx",
+  range="A1:A2"
+);
+select * from temp.abc_raw; -- @snap xl0_auto_cols
+
+-- xl0: headers=1
+create virtual table temp.students using xl0(
+  filename="tests/students.xlsx",
+  range="students!A1:D*",
+  headers=1
+);
+select * from temp.students; -- @snap xl0_headers
+
+-- xl0: explicit column names
+create virtual table temp.grades using xl0(
+  filename="tests/students.xlsx",
+  range="grades!A2:D*",
+  student_id, assignment_id, score, submitted
+);
+select * from temp.grades limit 5; -- @snap xl0_explicit_cols
+
+-- xl0: column type declarations with affinity
+create virtual table temp.grades_typed using xl0(
+  filename="tests/students.xlsx",
+  range="grades!A2:E*",
+  student_id integer, assignment_id integer, score integer,
+  submitted text, time_spent text
+);
+select *, typeof(student_id), typeof(score), typeof(time_spent)
+from temp.grades_typed limit 3; -- @snap xl0_typed_cols
+
+-- xl0: date-only, datetime, and time formatting
+create virtual table temp.students_dates using xl0(
+  filename="tests/students.xlsx",
+  range="students!A1:F*",
+  headers=1
+);
+select id, name, enrollment_date, birth_date
+from temp.students_dates limit 3; -- @snap xl0_dates

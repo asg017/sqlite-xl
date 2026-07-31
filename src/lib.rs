@@ -3,10 +3,11 @@ mod parser;
 mod rows;
 mod sheet_range;
 mod sheets;
+mod xl0;
 
 use calamine::{Data, DataType};
 use parser::column_name_to_idx;
-use sqlite_loadable::table::define_table_function_with_find;
+use sqlite_loadable::table::{define_table_function_with_find, define_virtual_table};
 use sqlite_loadable::{api, define_scalar_function, Error, Result};
 use sqlite_loadable::{define_table_function, prelude::*};
 
@@ -103,6 +104,7 @@ pub fn sqlite3_xl_init(db: *mut sqlite3) -> Result<()> {
     define_scalar_function(db, "xl_at", 2, xl_at, FunctionFlags::UTF8)?;
     define_scalar_function(db, "xl_version", 0, xl_version, FunctionFlags::UTF8)?;
     define_scalar_function(db, "xl_valid", 1, xl_valid, FunctionFlags::UTF8)?;
+    define_virtual_table::<xl0::XL0Table>(db, "xl0", None)?;
     Ok(())
 }
 

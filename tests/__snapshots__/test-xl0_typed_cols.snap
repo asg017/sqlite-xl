@@ -1,0 +1,35 @@
+Source: ../test.sql
+select *, typeof(student_id), typeof(score), typeof(time_spent)
+from temp.grades_typed limit 3;
+---
+{
+	 student_id: 1
+	 assignment_id: 101
+	 score: 92
+	 submitted: '2025-03-10 14:30:00'
+	 time_spent: '01:45:00'
+	 typeof(student_id): 'integer'
+	 typeof(score): 'integer'
+	 typeof(time_spent): 'text'
+}
+{
+	 student_id: 1
+	 assignment_id: 102
+	 score: 47
+	 submitted: '2025-03-12 09:15:00'
+	 time_spent: '00:50:00'
+	 typeof(student_id): 'integer'
+	 typeof(score): 'integer'
+	 typeof(time_spent): 'text'
+}
+{
+	 student_id: 1
+	 assignment_id: 103
+	 score: 71
+	 submitted: '2025-03-15 22:00:00'
+	 time_spent: '02:10:00'
+	 typeof(student_id): 'integer'
+	 typeof(score): 'integer'
+	 typeof(time_spent): 'text'
+}
+
