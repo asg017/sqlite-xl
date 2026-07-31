@@ -20,9 +20,11 @@ jobs:
           targets: wasm32-unknown-emscripten
       - uses: mymindstorm/setup-emsdk@v12
         with:
-          # sqlite-src-3440000's wasm build expects emsdk 3.1.x; emscripten 4+
-          # rejects the EXTRA_EXPORTED_RUNTIME_METHODS flag the build passes
-          version: "3.1.50"
+          # Needs late 3.1.x: emscripten 4+ rejects the
+          # EXTRA_EXPORTED_RUNTIME_METHODS flag sqlite-src-3440000's wasm build
+          # passes, while pre-3.1.65 wasm-opt lacks --enable-bulk-memory-opt,
+          # which current stable rustc emits
+          version: "3.1.74"
       - run: make site
       - uses: actions/configure-pages@v2
       - uses: actions/upload-pages-artifact@v3
