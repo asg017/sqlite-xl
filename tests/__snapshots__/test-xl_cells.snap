@@ -47,7 +47,7 @@ select rowid, * from xl_cells(readfile('tests/file-sample.xlsx'), 'A1:E2');
 	 rowid: 7
 	 column_name: 'C'
 	 row_number: 2
-	 value: '2000-01-01 00:00:00'
+	 value: '2000-01-01'
 }
 {
 	 rowid: 8

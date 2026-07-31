@@ -12,30 +12,30 @@ limit 5;
 	 student_id: 1
 	 assignment_id: 101
 	 score: 92
-	 submitted: '2025-03-10'
+	 submitted: '2025-03-10 14:30:00'
 }
 {
 	 student_id: 1
 	 assignment_id: 102
 	 score: 47
-	 submitted: '2025-03-12'
+	 submitted: '2025-03-12 09:15:00'
 }
 {
 	 student_id: 1
 	 assignment_id: 103
 	 score: 71
-	 submitted: '2025-03-15'
+	 submitted: '2025-03-15 22:00:00'
 }
 {
 	 student_id: 2
 	 assignment_id: 101
 	 score: 85
-	 submitted: '2025-03-11'
+	 submitted: '2025-03-11 16:45:00'
 }
 {
 	 student_id: 2
 	 assignment_id: 102
 	 score: 44
-	 submitted: '2025-03-12'
+	 submitted: '2025-03-12 10:00:00'
 }
 
