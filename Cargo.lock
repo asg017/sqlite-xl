@@ -377,9 +377,9 @@ dependencies = [
 
 [[package]]
 name = "libsqlite3-sys"
-version = "0.32.0"
+version = "0.26.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fbb8270bb4060bd76c6e96f20c52d80620f1d82a3470885694e41e0f81ef6fe7"
+checksum = "afc22eff61b133b115c6e8c74e818c628d6d5e7a502afea6f64dee076dd94326"
 dependencies = [
  "cc",
  "pkg-config",
@@ -599,6 +599,7 @@ checksum = "d66dc143e6b11c1eddc06d5c423cfc97062865baf299914ab64caa38182078fe"
 [[package]]
 name = "sqlite-loadable"
 version = "0.0.6-alpha.6"
+source = "git+https://github.com/asg017/sqlite-loadable-rs.git?rev=26cb2d88825451d4658c9eb8b61cee36a9577545#26cb2d88825451d4658c9eb8b61cee36a9577545"
 dependencies = [
  "bitflags 1.3.2",
  "libsqlite3-sys",
@@ -611,6 +612,7 @@ dependencies = [
 [[package]]
 name = "sqlite-loadable-macros"
 version = "0.0.3"
+source = "git+https://github.com/asg017/sqlite-loadable-rs.git?rev=26cb2d88825451d4658c9eb8b61cee36a9577545#26cb2d88825451d4658c9eb8b61cee36a9577545"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -629,6 +631,7 @@ dependencies = [
 [[package]]
 name = "sqlite3ext-sys"
 version = "0.0.1"
+source = "git+https://github.com/asg017/sqlite-loadable-rs.git?rev=26cb2d88825451d4658c9eb8b61cee36a9577545#26cb2d88825451d4658c9eb8b61cee36a9577545"
 dependencies = [
  "bindgen",
 ]

@@ -5,7 +5,7 @@ edition = "2021"
 
 [dependencies]
 #sqlite-loadable = "0.0.6-alpha.6"
-sqlite-loadable = { path="../sqlite-loadable-rs"}
+sqlite-loadable = { git = "https://github.com/asg017/sqlite-loadable-rs.git", rev = "26cb2d88825451d4658c9eb8b61cee36a9577545" }
 #calamine = {version="0.23.1", features=["dates"]}
 calamine = {version="0.30.0", features=["dates"]}
 thiserror = "1.0"
